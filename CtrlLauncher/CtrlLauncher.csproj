@@ -10,24 +10,34 @@
     <PackageDirectory>$(MSBuildProjectDirectory)\..\build\CtrlLauncher\</PackageDirectory>
   </PropertyGroup>
 
-  <!-- Visual Studioのビルド後に、そのまま配布できる自己完結フォルダーを作る。 -->
+  <!-- Visual Studioのビルド後に、そのまま配布できるフォルダーを作る。 -->
   <Target Name="CreateLauncherPackage" AfterTargets="Build">
     <ItemGroup>
-      <PackageBuildFiles Include="$(TargetDir)**\*" />
+      <PackageBuildFiles Include="$(TargetDir)**\*" Exclude="$(TargetDir)**\*.pdb" />
       <PackageDataFiles Include="$(ProjectDir)data\**\*" />
     </ItemGroup>
+
+    <!-- 削除済みゲームが配布先に残らないよう、dataだけは毎回作り直す。 -->
+    <RemoveDir Directories="$(PackageDirectory)data" />
     <MakeDir Directories="$(PackageDirectory);$(PackageDirectory)data;$(PackageDirectory)games" />
+
     <Copy SourceFiles="@(PackageBuildFiles)"
           DestinationFiles="@(PackageBuildFiles->'$(PackageDirectory)%(RecursiveDir)%(Filename)%(Extension)')"
           SkipUnchangedFiles="true" />
+
     <Copy SourceFiles="$(ProjectDir)genres.json;$(ProjectDir)time.txt"
           DestinationFolder="$(PackageDirectory)"
           SkipUnchangedFiles="true"
           Condition="Exists('$(ProjectDir)genres.json') And Exists('$(ProjectDir)time.txt')" />
+
     <Copy SourceFiles="@(PackageDataFiles)"
           DestinationFiles="@(PackageDataFiles->'$(PackageDirectory)data\%(RecursiveDir)%(Filename)%(Extension)')"
           SkipUnchangedFiles="true" />
-    <WriteLinesToFile File="$(PackageDirectory)time.txt" Lines="30" Overwrite="false" Condition="!Exists('$(PackageDirectory)time.txt')" />
+
+    <WriteLinesToFile File="$(PackageDirectory)time.txt"
+                      Lines="30"
+                      Overwrite="false"
+                      Condition="!Exists('$(PackageDirectory)time.txt')" />
   </Target>
 
 </Project>

@@ -28,6 +28,7 @@ public sealed class MainViewModel : ObservableObject
     private string _selectedGenreFilter = AllGenresLabel;
     private DifficultyFilterChoice _selectedDifficultyFilter;
     private const string AllGenresLabel = "すべてのジャンル";
+    private const string RepositoryUrl = "https://github.com/NakakouTV/CtrlLauncher";
 
     public MainViewModel(GameRepository repository, LauncherSettingsService settings, GameRunner gameRunner,
         DesktopSessionService desktopSession, DialogService dialogs, GenreCatalogService genres,
@@ -61,6 +62,7 @@ public sealed class MainViewModel : ObservableObject
         ContinueCommand = new RelayCommand(() => ResolveTimeDecision(TimeDecision.Continue));
         ChangePlayerCommand = new RelayCommand(() => ResolveTimeDecision(TimeDecision.ChangePlayer));
         ExitCommand = new RelayCommand(() => ExitRequested?.Invoke(), () => IsAdminMode && !IsBusy);
+        OpenRepositoryCommand = new RelayCommand(OpenRepository, () => IsAdminMode);
     }
 
     public event Action? ExitRequested;
@@ -77,6 +79,7 @@ public sealed class MainViewModel : ObservableObject
     public RelayCommand ContinueCommand { get; }
     public RelayCommand ChangePlayerCommand { get; }
     public RelayCommand ExitCommand { get; }
+    public RelayCommand OpenRepositoryCommand { get; }
     public bool IsExhibitionSession { get; }
 
     public GameEntry? SelectedGame
@@ -244,6 +247,19 @@ public sealed class MainViewModel : ObservableObject
 
     private void ResolveTimeDecision(TimeDecision decision) => _timeDecision?.TrySetResult(decision);
 
+    private void OpenRepository()
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(RepositoryUrl) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            _log.Error("GitHubを開けませんでした。", ex);
+            _dialogs.ShowError("GitHubを開けませんでした。");
+        }
+    }
+
     private void SetLauncherVisible(bool visible)
     {
         if (IsExhibitionSession)
@@ -258,6 +274,7 @@ public sealed class MainViewModel : ObservableObject
         EditGameCommand.NotifyCanExecuteChanged();
         ExhibitionModeCommand.NotifyCanExecuteChanged();
         ExitCommand.NotifyCanExecuteChanged();
+        OpenRepositoryCommand.NotifyCanExecuteChanged();
     }
 
     private void RefreshGenreFilters()

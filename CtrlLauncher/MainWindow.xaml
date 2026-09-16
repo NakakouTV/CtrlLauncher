@@ -167,6 +167,9 @@
             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
             <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" Foreground="{StaticResource MutedTextBrush}" />
             <StackPanel Grid.Column="1" Orientation="Horizontal" Visibility="{Binding IsAdminMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TextBlock VerticalAlignment="Center" Margin="0,0,14,0">
+                    <Hyperlink Command="{Binding OpenRepositoryCommand}">GitHubを開く</Hyperlink>
+                </TextBlock>
                 <Button Content="展示モード" Command="{Binding ExhibitionModeCommand}" Background="#FF7C3AED" Margin="0,0,8,0" />
                 <Button Content="追加" Command="{Binding AddGameCommand}" Margin="0,0,8,0" />
                 <Button Content="編集" Command="{Binding EditGameCommand}" Margin="0,0,8,0" />
