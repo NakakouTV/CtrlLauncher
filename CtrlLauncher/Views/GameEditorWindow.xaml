@@ -1,0 +1,61 @@
+<Window x:Class="CtrlLauncher.Views.GameEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ゲームの登録・編集" Width="760" Height="700" MinWidth="680" MinHeight="600"
+        WindowStartupLocation="CenterOwner" Background="{StaticResource BackgroundBrush}">
+    <Grid Margin="24">
+        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+        <StackPanel Margin="0,0,0,18">
+            <TextBlock Text="ゲームの登録・編集" FontSize="25" FontWeight="Bold" Foreground="{StaticResource TextBrush}" />
+            <TextBlock Text="最初に実行ファイルを選んでください。ゲーム名はファイル名から自動入力され、自由に編集できます。" Margin="0,5,0,0" Foreground="{StaticResource MutedTextBrush}" />
+        </StackPanel>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Grid Margin="0,0,12,0">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="150" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Text="実行ファイル" VerticalAlignment="Center" Margin="0,0,12,14" />
+                <TextBox Grid.Column="1" Text="{Binding ExecutablePath}" Margin="0,0,8,14" IsReadOnly="True" />
+                <Button Grid.Column="2" Content="選択" Command="{Binding BrowseExecutableCommand}" Margin="0,0,0,14" Padding="16,8" />
+                <TextBlock Grid.Row="1" Text="ゲーム名" VerticalAlignment="Center" Margin="0,0,12,14" />
+                <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding GameName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,14" />
+                <TextBlock Grid.Row="2" Text="画像" VerticalAlignment="Center" Margin="0,0,12,14" />
+                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ScreenshotPath}" Margin="0,0,8,14" IsReadOnly="True" />
+                <Button Grid.Row="2" Grid.Column="2" Content="選択" Command="{Binding BrowseScreenshotCommand}" Margin="0,0,0,14" Padding="16,8" />
+                <TextBlock Grid.Row="3" Text="ジャンル" VerticalAlignment="Center" Margin="0,0,12,14" />
+                <ComboBox Grid.Row="3" Grid.Column="1" ItemsSource="{Binding GenreChoices}" Text="{Binding Genre, UpdateSourceTrigger=PropertyChanged}"
+                          IsEditable="True" IsTextSearchEnabled="True" Margin="0,0,8,14" />
+                <StackPanel Grid.Row="3" Grid.Column="2" Orientation="Horizontal" Margin="0,0,0,14">
+                    <Button Content="追加" Command="{Binding AddGenreCommand}" Padding="12,8" Margin="0,0,6,0" />
+                    <Button Content="削除" Command="{Binding RemoveGenreCommand}" Style="{StaticResource SecondaryButton}" Padding="12,8" />
+                </StackPanel>
+                <TextBlock Grid.Row="4" Text="説明" VerticalAlignment="Top" Margin="0,9,12,14" />
+                <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                         AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" MinHeight="110" Margin="0,0,0,14" />
+                <TextBlock Grid.Row="5" Text="難易度" VerticalAlignment="Center" Margin="0,0,12,14" />
+                <CheckBox Grid.Row="5" Grid.Column="1" Content="難易度を表示する" IsChecked="{Binding DifficultyEnabled}" VerticalAlignment="Center" Margin="0,0,0,14" />
+                <StackPanel Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal">
+                    <TextBlock Text="最低" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <ComboBox ItemsSource="{Binding DifficultyChoices}" DisplayMemberPath="Label" SelectedValuePath="Value"
+                              SelectedValue="{Binding MinDifficulty}" Width="130" IsEnabled="{Binding DifficultyEnabled}" />
+                    <TextBlock Text="最高" VerticalAlignment="Center" Margin="24,0,8,0" />
+                    <ComboBox ItemsSource="{Binding DifficultyChoices}" DisplayMemberPath="Label" SelectedValuePath="Value"
+                              SelectedValue="{Binding MaxDifficulty}" Width="130" IsEnabled="{Binding DifficultyEnabled}" />
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+        <Grid Grid.Row="2" Margin="0,18,0,0">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+            <Button Content="このゲームを削除" Command="{Binding DeleteCommand}" Background="#FFDC2626" Margin="0,0,14,0"
+                    Visibility="{Binding CanDelete, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            <TextBlock Grid.Column="1" Text="{Binding ValidationMessage}" Foreground="#FFDC2626" VerticalAlignment="Center" TextWrapping="Wrap" />
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <Button Content="キャンセル" Command="{Binding CancelCommand}" Style="{StaticResource SecondaryButton}" Margin="0,0,10,0" />
+                <Button Content="{Binding SaveButtonText}" Command="{Binding SaveCommand}" Background="{StaticResource AccentBrush}" MinWidth="110" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

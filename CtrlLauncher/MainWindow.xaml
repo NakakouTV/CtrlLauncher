@@ -1,12 +1,192 @@
-﻿<Window x:Class="CtrlLauncher.MainWindow"
+<Window x:Class="CtrlLauncher.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:CtrlLauncher"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="CtrlLauncher" Width="1280" Height="720" MinWidth="960" MinHeight="600"
+        WindowStartupLocation="CenterScreen" Background="{StaticResource BackgroundBrush}"
+        d:DataContext="{d:DesignInstance Type=viewModels:MainViewModel, IsDesignTimeCreatable=False}"
+        xmlns:viewModels="clr-namespace:CtrlLauncher.ViewModels">
     <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#FFF0F7FF" Offset="0" />
+                <GradientStop Color="#FFFFF7ED" Offset="1" />
+            </LinearGradientBrush>
+        </Grid.Background>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
+        <Grid Margin="28,22,28,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Text="CtrlLauncher" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextBrush}" />
+                <TextBlock Text="遊びたいゲームを選んでください" FontSize="14" Foreground="{StaticResource MutedTextBrush}" />
+            </StackPanel>
+            <Border Grid.Column="1" Background="#1A2563EB" CornerRadius="16" Padding="14,7"
+                    Visibility="{Binding IsAdminMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TextBlock Text="管理モード" Foreground="{StaticResource PrimaryDarkBrush}" FontWeight="SemiBold" />
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="28,8,28,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="340" />
+                <ColumnDefinition Width="20" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Background="White" CornerRadius="18" Padding="12">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="ゲーム一覧" Margin="10,6,10,12" FontSize="18" FontWeight="Bold" />
+                    <Grid Grid.Row="1" Margin="8,0,8,10">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="10" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="ジャンル" Margin="2,0,0,4" FontSize="12" Foreground="{StaticResource MutedTextBrush}" />
+                            <ComboBox ItemsSource="{Binding GenreFilterChoices}" SelectedItem="{Binding SelectedGenreFilter}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="難易度" Margin="2,0,0,4" FontSize="12" Foreground="{StaticResource MutedTextBrush}" />
+                            <ComboBox ItemsSource="{Binding DifficultyFilterChoices}" DisplayMemberPath="Label"
+                                      SelectedItem="{Binding SelectedDifficultyFilter}" />
+                        </StackPanel>
+                    </Grid>
+                    <ListBox Grid.Row="2" ItemsSource="{Binding GamesView}" SelectedItem="{Binding SelectedGame}"
+                             BorderThickness="0" Background="Transparent" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Margin" Value="0,3" />
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="Tile" Background="#FFEDF4FF" CornerRadius="10" Padding="15,13">
+                                                <ContentPresenter />
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="Tile" Property="Background" Value="{StaticResource PrimaryBrush}" />
+                                                    <Setter Property="Foreground" Value="White" />
+                                                </Trigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Tile" Property="Opacity" Value="0.88" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding Genre}" Margin="0,3,0,0" FontSize="12" Opacity="0.75" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="2" Background="White" CornerRadius="18" Padding="26">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="3*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid ClipToBounds="True">
+                        <Border x:Name="Placeholder" Background="#FFFACC15" CornerRadius="12">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="画像がありません" FontSize="21" FontWeight="Bold" Foreground="#FF713F12" />
+                                <TextBlock Text="管理モードから画像を登録できます" Margin="0,6,0,0" Foreground="#FF854D0E" />
+                            </StackPanel>
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedGame.HasScreenshot}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                        </Border>
+                        <Border CornerRadius="12" ClipToBounds="True" Background="#FFE5E7EB">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedGame.HasScreenshot}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <Image Source="{Binding SelectedGame.ScreenshotFullPath}" Stretch="UniformToFill" />
+                        </Border>
+                    </Grid>
+
+                    <Grid Grid.Row="1" Margin="0,18,0,6">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="{Binding SelectedGame.Title, TargetNullValue=ゲーム未選択}" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextBrush}" />
+                            <TextBlock Text="{Binding SelectedGame.Genre}" Margin="0,4,0,0" FontSize="15" Foreground="{StaticResource PrimaryDarkBrush}" />
+                        </StackPanel>
+                        <Border Grid.Column="1" Background="#FFF2F4F7" CornerRadius="10" Padding="12,8" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding SelectedGame.DifficultyText, StringFormat=難易度: {0}}" Foreground="{StaticResource MutedTextBrush}" />
+                        </Border>
+                    </Grid>
+                    <Separator Grid.Row="2" Margin="0,5,0,10" Background="#FFE4E7EC" />
+                    <TextBlock Grid.Row="3" Text="{Binding SelectedGame.Description}" TextWrapping="Wrap" FontSize="15"
+                               LineHeight="24" Foreground="{StaticResource TextBrush}" />
+                    <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="はじめる" Command="{Binding StartGameCommand}" Background="{StaticResource AccentBrush}" MinWidth="150" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="2" Margin="28,0,28,20">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" Foreground="{StaticResource MutedTextBrush}" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Visibility="{Binding IsAdminMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Button Content="展示モード" Command="{Binding ExhibitionModeCommand}" Background="#FF7C3AED" Margin="0,0,8,0" />
+                <Button Content="追加" Command="{Binding AddGameCommand}" Margin="0,0,8,0" />
+                <Button Content="編集" Command="{Binding EditGameCommand}" Margin="0,0,8,0" />
+                <Button Content="再読込" Command="{Binding RefreshCommand}" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0" />
+                <Button Content="終了" Command="{Binding ExitCommand}" Background="#FFDC2626" />
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.RowSpan="3" Panel.ZIndex="10" Background="#CC101828"
+                Visibility="{Binding TimeExpired, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border Width="620" Padding="42" Background="White" CornerRadius="22" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="時間になりました！" HorizontalAlignment="Center" FontSize="32" FontWeight="Bold" Foreground="{StaticResource TextBrush}" />
+                    <TextBlock Text="ならんでいる人がいたら、交代してください！" Margin="0,14,0,28" HorizontalAlignment="Center" FontSize="18" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="つづける" Command="{Binding ContinueCommand}" Style="{StaticResource SecondaryButton}" MinWidth="150" Margin="0,0,12,0" />
+                        <Button Content="交代する" Command="{Binding ChangePlayerCommand}" Background="{StaticResource AccentBrush}" MinWidth="150" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
     </Grid>
 </Window>
