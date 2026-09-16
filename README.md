@@ -43,4 +43,6 @@ data/
 DebugビルドはVisual Studioで確認しやすいようプロジェクト直下の `data`、`src`、`logs`、`time.txt` を使用します。
 Releaseビルドは実行ファイルのあるフォルダーを基準にします。環境変数 `CTRL_LAUNCHER_HOME` を指定すると基準フォルダーを上書きできます。
 
+ビルドが完了すると、ソリューション直下の `build/CtrlLauncher` に配布用フォルダーを自動生成します。ランチャー本体、`data`、ゲーム配置用の `games`、`genres.json`、`time.txt` が同じフォルダーにまとまります。
+
 詳しい構成は [CtrlLauncher/docs/ARCHITECTURE.md](CtrlLauncher/docs/ARCHITECTURE.md) を参照してください。

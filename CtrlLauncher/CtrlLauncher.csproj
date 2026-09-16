@@ -7,6 +7,27 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PackageDirectory>$(MSBuildProjectDirectory)\..\build\CtrlLauncher\</PackageDirectory>
   </PropertyGroup>
+
+  <!-- Visual Studioのビルド後に、そのまま配布できる自己完結フォルダーを作る。 -->
+  <Target Name="CreateLauncherPackage" AfterTargets="Build">
+    <ItemGroup>
+      <PackageBuildFiles Include="$(TargetDir)**\*" />
+      <PackageDataFiles Include="$(ProjectDir)data\**\*" />
+    </ItemGroup>
+    <MakeDir Directories="$(PackageDirectory);$(PackageDirectory)data;$(PackageDirectory)games" />
+    <Copy SourceFiles="@(PackageBuildFiles)"
+          DestinationFiles="@(PackageBuildFiles->'$(PackageDirectory)%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(ProjectDir)genres.json;$(ProjectDir)time.txt"
+          DestinationFolder="$(PackageDirectory)"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(ProjectDir)genres.json') And Exists('$(ProjectDir)time.txt')" />
+    <Copy SourceFiles="@(PackageDataFiles)"
+          DestinationFiles="@(PackageDataFiles->'$(PackageDirectory)data\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+    <WriteLinesToFile File="$(PackageDirectory)time.txt" Lines="30" Overwrite="false" Condition="!Exists('$(PackageDirectory)time.txt')" />
+  </Target>
 
 </Project>
