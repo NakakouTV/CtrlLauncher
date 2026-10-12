@@ -19,6 +19,7 @@ public sealed class GameEditorViewModel : ObservableObject
     private string _genre;
     private string _description;
     private string _executablePath;
+    private string _executableFullPath;
     private string _screenshotPath;
     private Difficulty _minDifficulty;
     private Difficulty _maxDifficulty;
@@ -39,7 +40,10 @@ public sealed class GameEditorViewModel : ObservableObject
         _gameName = _game.Title;
         _genre = _game.Genre;
         _description = _game.Description;
-        _executablePath = _game.ExecutableFullPath;
+        _executableFullPath = _game.ExecutableFullPath;
+        _executablePath = string.IsNullOrWhiteSpace(_game.ExecutablePath)
+            ? ToPortablePath(_executableFullPath)
+            : _game.ExecutablePath;
         _screenshotPath = _game.ScreenshotFullPath;
         _minDifficulty = _game.MinDifficulty == Difficulty.Default ? Difficulty.Easy : _game.MinDifficulty;
         _maxDifficulty = _game.MaxDifficulty == Difficulty.Default ? Difficulty.Hard : _game.MaxDifficulty;
@@ -108,7 +112,8 @@ public sealed class GameEditorViewModel : ObservableObject
         var dialog = new OpenFileDialog { Filter = "実行ファイル (*.exe)|*.exe|すべてのファイル (*.*)|*.*" };
         if (dialog.ShowDialog() == true)
         {
-            ExecutablePath = dialog.FileName;
+            _executableFullPath = dialog.FileName;
+            ExecutablePath = ToPortablePath(dialog.FileName);
             GameName = Path.GetFileNameWithoutExtension(dialog.FileName);
         }
     }
@@ -130,7 +135,7 @@ public sealed class GameEditorViewModel : ObservableObject
             _game.Title = GameName;
             _game.Genre = Genre.Trim();
             _game.Description = Description.Trim();
-            _game.ExecutableFullPath = ExecutablePath.Trim();
+            _game.ExecutableFullPath = _executableFullPath;
             _game.ScreenshotFullPath = ScreenshotPath.Trim();
             _game.MinDifficulty = DifficultyEnabled ? MinDifficulty : Difficulty.Default;
             _game.MaxDifficulty = DifficultyEnabled ? MaxDifficulty : Difficulty.Default;
@@ -196,7 +201,7 @@ public sealed class GameEditorViewModel : ObservableObject
     {
         var nameError = GetGameNameError();
         if (nameError is not null) return nameError;
-        if (string.IsNullOrWhiteSpace(ExecutablePath) || !File.Exists(ExecutablePath)) return "有効な実行ファイルを選択してください。";
+        if (string.IsNullOrWhiteSpace(_executableFullPath) || !File.Exists(_executableFullPath)) return "有効な実行ファイルを選択してください。";
         if (!string.IsNullOrWhiteSpace(ScreenshotPath) && !File.Exists(ScreenshotPath)) return "画像ファイルが見つかりません。";
         if (DifficultyEnabled && MinDifficulty > MaxDifficulty) return "最低難易度は最高難易度以下にしてください。";
         return string.Empty;
@@ -218,6 +223,10 @@ public sealed class GameEditorViewModel : ObservableObject
     }
 
     private void UpdateGameNameValidation() => ValidationMessage = GetGameNameError() ?? string.Empty;
+
+    private string ToPortablePath(string fullPath) => string.IsNullOrWhiteSpace(fullPath)
+        ? string.Empty
+        : _paths.MakePortablePath(_paths.RootDirectory, fullPath);
 
     public sealed record DifficultyChoice(Difficulty Value, string Label);
 }

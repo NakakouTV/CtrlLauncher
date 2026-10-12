@@ -15,6 +15,7 @@
     <ItemGroup>
       <PackageBuildFiles Include="$(TargetDir)**\*" Exclude="$(TargetDir)**\*.pdb" />
       <PackageDataFiles Include="$(ProjectDir)data\**\*" />
+      <PackageGameFiles Include="$(ProjectDir)games\**\*" />
     </ItemGroup>
 
     <!-- 削除済みゲームが配布先に残らないよう、dataだけは毎回作り直す。 -->
@@ -32,6 +33,10 @@
 
     <Copy SourceFiles="@(PackageDataFiles)"
           DestinationFiles="@(PackageDataFiles->'$(PackageDirectory)data\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+
+    <Copy SourceFiles="@(PackageGameFiles)"
+          DestinationFiles="@(PackageGameFiles->'$(PackageDirectory)games\%(RecursiveDir)%(Filename)%(Extension)')"
           SkipUnchangedFiles="true" />
 
     <WriteLinesToFile File="$(PackageDirectory)time.txt"

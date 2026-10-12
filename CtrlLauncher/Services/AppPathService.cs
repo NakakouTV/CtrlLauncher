@@ -4,6 +4,7 @@ public sealed class AppPathService
 {
     public string RootDirectory { get; } = FindRootDirectory();
     public string DataDirectory => Path.Combine(RootDirectory, "data");
+    public string GamesDirectory => Path.Combine(RootDirectory, "games");
     public string SourceDirectory => Path.Combine(RootDirectory, "src");
     public string LogDirectory => Path.Combine(RootDirectory, "logs");
     public string TimeSettingsPath => Path.Combine(RootDirectory, "time.txt");
@@ -12,6 +13,7 @@ public sealed class AppPathService
     public void EnsureDirectories()
     {
         Directory.CreateDirectory(DataDirectory);
+        Directory.CreateDirectory(GamesDirectory);
         Directory.CreateDirectory(SourceDirectory);
         Directory.CreateDirectory(LogDirectory);
     }
@@ -21,21 +23,18 @@ public sealed class AppPathService
         if (string.IsNullOrWhiteSpace(path)) return string.Empty;
         if (Path.IsPathRooted(path)) return Path.GetFullPath(path);
 
+        var fromRoot = Path.GetFullPath(Path.Combine(RootDirectory, path));
+        if (File.Exists(fromRoot) || Directory.Exists(fromRoot)) return fromRoot;
         var fromGame = Path.GetFullPath(Path.Combine(gameDirectory, path));
-        if (File.Exists(fromGame) || Directory.Exists(fromGame)) return fromGame;
-        return Path.GetFullPath(Path.Combine(RootDirectory, path));
+        return fromGame;
     }
 
     public string MakePortablePath(string gameDirectory, string path)
     {
         if (string.IsNullOrWhiteSpace(path)) return string.Empty;
         var fullPath = Path.GetFullPath(path);
-        var relative = Path.GetRelativePath(gameDirectory, fullPath);
-        return IsOutside(relative) ? fullPath : relative;
+        return Path.GetRelativePath(RootDirectory, fullPath);
     }
-
-    private static bool IsOutside(string relativePath) =>
-        relativePath == ".." || relativePath.StartsWith($"..{Path.DirectorySeparatorChar}", StringComparison.Ordinal);
 
     private static string FindRootDirectory()
     {
