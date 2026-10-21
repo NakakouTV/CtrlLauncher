@@ -139,7 +139,9 @@
                                     </Style.Triggers>
                                 </Style>
                             </Border.Style>
-                            <Image Source="{Binding SelectedGame.ScreenshotFullPath}" Stretch="UniformToFill" />
+                            <!-- 縦横比を維持し、縦長・横長どちらの画像も切り取らず全体を表示する。 -->
+                            <Image Source="{Binding SelectedGame.ScreenshotFullPath}" Stretch="Uniform"
+                                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
                         </Border>
                     </Grid>
 
